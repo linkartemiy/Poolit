@@ -1,4 +1,4 @@
-namespace WebApplication1;
+namespace Poolit;
 
 public class WeatherForecast
 {
