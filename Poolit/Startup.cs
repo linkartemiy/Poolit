@@ -1,95 +1,91 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
-using Poolit.Models;
-using Poolit.Repositories;
-using Poolit.Repositories.Interfaces;
-using Poolit.Services;
-using Poolit.Services.Interfaces;
+//using Poolit.Services;
+//using Poolit.Services.Interfaces;
 
-namespace Poolit
+namespace Poolit;
+
+public class Startup
 {
-    public class Startup
+    private bool InDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+
+    public Startup(IConfiguration configuration)
     {
-        private bool InDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+        Configuration = configuration;
+    }
 
-        public Startup(IConfiguration configuration)
+    public IConfiguration Configuration { get; }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        //services.AddTransient<IUserService, UserService>();
+
+        services.AddEndpointsApiExplorer();
+
+        services.AddSwaggerGen(options =>
         {
-            Configuration = configuration;
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "API",
+                Version = "v1",
+                Description = "API",
+            });
+            var filePath = Path.Combine(AppContext.BaseDirectory, "Poolit.xml");
+            options.IncludeXmlComments(filePath);
+        });
+
+        //services.AddControllers().AddNewtonsoftJson(options =>
+        //options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+        //services.AddControllers().AddNewtonsoftJson();
+
+        services.Configure<IISServerOptions>(options =>
+        {
+            options.MaxRequestBodySize = int.MaxValue;
+        });
+
+        services.Configure<FormOptions>(x =>
+        {
+            x.ValueLengthLimit = int.MaxValue;
+            x.MultipartBodyLengthLimit = int.MaxValue;
+            x.MultipartHeadersLengthLimit = int.MaxValue;
+        });
+
+        services.AddMvc();
+
+        //services.AddSwaggerGenNewtonsoftSupport();
+        //   services.Configure<Configuration>(Configuration.GetSection("ConnectionStrings"));
+        /*if (InDocker)
+        {
+            Database.ConnectionString = Configuration.GetConnectionString("DatabaseInDocker");
+        }
+        else
+        {
+            Database.ConnectionString = Configuration.GetConnectionString("Database");
+        }*/
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment() || env.IsProduction())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                options.RoutePrefix = string.Empty;
+            });
+            app.UseDeveloperExceptionPage();
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseHttpsRedirection();
 
-        public void ConfigureServices(IServiceCollection services)
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-            services.AddTransient<IUserService, UserService>();
-
-            services.AddEndpointsApiExplorer();
-
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "API",
-                    Version = "v1",
-                    Description = "API",
-                });
-                var filePath = Path.Combine(AppContext.BaseDirectory, "Poolit.xml");
-                options.IncludeXmlComments(filePath);
-            });
-
-            //services.AddControllers().AddNewtonsoftJson(options =>
-            //options.SerializerSettings.Converters.Add(new StringEnumConverter()));
-            //services.AddControllers().AddNewtonsoftJson();
-
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.MaxRequestBodySize = int.MaxValue;
-            });
-
-            services.Configure<FormOptions>(x =>
-            {
-                x.ValueLengthLimit = int.MaxValue;
-                x.MultipartBodyLengthLimit = int.MaxValue;
-                x.MultipartHeadersLengthLimit = int.MaxValue;
-            });
-
-            services.AddMvc();
-
-            //services.AddSwaggerGenNewtonsoftSupport();
-            //   services.Configure<Configuration>(Configuration.GetSection("ConnectionStrings"));
-            /*if (InDocker)
-            {
-                Database.ConnectionString = Configuration.GetConnectionString("DatabaseInDocker");
-            }
-            else
-            {
-                Database.ConnectionString = Configuration.GetConnectionString("Database");
-            }*/
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment() || env.IsProduction())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                    options.RoutePrefix = string.Empty;
-                });
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+            endpoints.MapControllers();
+        });
     }
 }
