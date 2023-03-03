@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
-//using Poolit.Services;
-//using Poolit.Services.Interfaces;
+using Poolit.Services;
+using Poolit.Services.Interfaces;
 
 namespace Poolit;
 
@@ -18,7 +18,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        //services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IUserService, UserService>();
 
         services.AddEndpointsApiExplorer();
 
@@ -72,7 +72,7 @@ public class Startup
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                options.RoutePrefix = string.Empty;
+                options.RoutePrefix = "swagger";
             });
             app.UseDeveloperExceptionPage();
         }
