@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Poolit.Services;
 using Poolit.Services.Interfaces;
@@ -49,8 +50,9 @@ public class Startup
             x.MultipartBodyLengthLimit = int.MaxValue;
             x.MultipartHeadersLengthLimit = int.MaxValue;
         });
-
         services.AddMvc();
+
+        services.Configure<TokensConfiguration>(Configuration.GetSection("Tokens"));
 
         //services.AddSwaggerGenNewtonsoftSupport();
         //   services.Configure<Configuration>(Configuration.GetSection("ConnectionStrings"));

@@ -6,8 +6,8 @@ using Poolit.Services.Interfaces;
 
 namespace Poolit.Controllers;
 
-[ApiController]
 [Route("[controller]")]
+[ApiController]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -29,7 +29,7 @@ public class UserController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register(string login, string password)
+    public async Task<ActionResult<RegisterResponse>> Register(string login, string password)
     {
         try
         {
@@ -53,16 +53,17 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="login">User's login.</param>
     /// <param name="password">User's password.</param>
+    /// <param name="token">User's token.</param>
     /// <returns></returns>
     [Route("/login")]
     [HttpPost]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Login(string login, string password)
+    public async Task<ActionResult<LoginResponse>> Login(string login, string password, string? token)
     {
         try
         {
-            var request = new LoginRequest { Login = login, Password = password };
+            var request = new LoginRequest { Login = login, Password = password, Token = token };
             var response = await _userService.LoginAsync(request);
             return response.Status switch
             {

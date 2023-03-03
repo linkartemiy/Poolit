@@ -4,11 +4,8 @@
     public class User
     {
         public int Id { get; set; }
-        public string Login { get; set; }
-
-        public User(string login)
-        {
-            Login = login;
-        }
+        public required string Login { get; set; }
+        public string HashedPassword { get; set; }
+        public string Token { get; set; }
     }
 }
