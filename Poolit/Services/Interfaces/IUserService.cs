@@ -1,12 +1,10 @@
-﻿using Poolit.Models.User;
-using Poolit.Models.User.Requests;
-using Poolit.Models.User.Responses;
+﻿using Poolit.Models.Requests;
+using Poolit.Models.Responses;
 
-namespace Poolit.Services.Interfaces
+namespace Poolit.Services.Interfaces;
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-        public Task<RegisterResponse> RegisterAsync(RegisterRequest request);
-        public Task<LoginResponse> LoginAsync(LoginRequest request);
-    }
+    public Task<RegisterResponse> RegisterAsync(RegisterRequest request);
+    public Task<LoginResponse> LoginAsync(LoginRequest request);
 }

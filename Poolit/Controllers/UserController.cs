@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Poolit.Models.User;
-using Poolit.Models.User.Requests;
-using Poolit.Models.User.Responses;
+using Poolit.Models;
+using Poolit.Models.Requests;
+using Poolit.Models.Responses;
 using Poolit.Services.Interfaces;
 
 namespace Poolit.Controllers;
@@ -37,13 +37,13 @@ public class UserController : ControllerBase
             var response = await _userService.RegisterAsync(request);
             return response.Status switch
             {
-                AuthStatus.Success => Ok(response),
+                200 => Ok(response),
                 _ => BadRequest(response)
             };
         }
         catch (Exception e)
         {
-            var response = new RegisterResponse { Status = AuthStatus.Error, Error = e.Message };
+            var response = new RegisterResponse { Status = 400, Error = e.Message };
             return BadRequest(response);
         }
     }
@@ -63,17 +63,22 @@ public class UserController : ControllerBase
     {
         try
         {
-            var request = new LoginRequest { Login = login, Password = password, Token = token };
+            var request = new LoginRequest
+            {
+                Login = login,
+                Password = password,
+                Token = token
+            };
             var response = await _userService.LoginAsync(request);
             return response.Status switch
             {
-                AuthStatus.Success => Ok(response),
+                200 => Ok(response),
                 _ => BadRequest(response)
             };
         }
         catch (Exception e)
         {
-            var response = new LoginResponse { Status = AuthStatus.Error, Error = e.Message };
+            var response = new LoginResponse { Status = 400, Error = e.Message };
             return BadRequest(response);
         }
     }

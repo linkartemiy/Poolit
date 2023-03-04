@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Poolit.Models.User;
-using Poolit.Models.User.Requests;
-using Poolit.Models.User.Responses;
+using Poolit.Models;
+using Poolit.Models.Requests;
+using Poolit.Models.Responses;
 using Poolit.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -31,7 +31,7 @@ public class UserService : IUserService
         return new RegisterResponse
         {
             User = user,
-            Status = AuthStatus.Success,
+            Status = 200,
         };
     }
 
@@ -53,7 +53,7 @@ public class UserService : IUserService
             return new LoginResponse
             {
                 Error = "Wrong login or password",
-                Status = AuthStatus.Error,
+                Status = 400,
             };
         }
 
@@ -62,7 +62,7 @@ public class UserService : IUserService
         return new LoginResponse
         {
             User = user,
-            Status = AuthStatus.Success,
+            Status = 200,
         };
     }
 

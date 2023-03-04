@@ -1,7 +1,6 @@
-﻿namespace Poolit
+﻿namespace Poolit;
+
+public class TokensConfiguration
 {
-    public class TokensConfiguration
-    {
-        public string JWT { get; set; }
-    }
+    public string JWT { get; set; }
 }
