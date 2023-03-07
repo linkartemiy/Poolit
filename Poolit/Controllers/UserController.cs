@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="login">User's login.</param>
     /// <param name="password">User's password.</param>
-    /// <returns></returns>
+    /// <returns>User</returns>
     [Route("/register")]
     [HttpPost]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
@@ -35,15 +35,11 @@ public class UserController : ControllerBase
         {
             var request = new RegisterRequest { Login = login, Password = password };
             var response = await _userService.RegisterAsync(request);
-            return response.Status switch
-            {
-                200 => Ok(response),
-                _ => BadRequest(response)
-            };
+            return response.HasError is false ? Ok(response) : BadRequest(response);
         }
         catch (Exception e)
         {
-            var response = new RegisterResponse { Status = 400, Error = e.Message };
+            var response = new RegisterResponse { HasError = true, Error = e.Message };
             return BadRequest(response);
         }
     }
@@ -54,7 +50,7 @@ public class UserController : ControllerBase
     /// <param name="login">User's login.</param>
     /// <param name="password">User's password.</param>
     /// <param name="token">User's token.</param>
-    /// <returns></returns>
+    /// <returns>User</returns>
     [Route("/login")]
     [HttpPost]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
@@ -70,15 +66,11 @@ public class UserController : ControllerBase
                 Token = token
             };
             var response = await _userService.LoginAsync(request);
-            return response.Status switch
-            {
-                200 => Ok(response),
-                _ => BadRequest(response)
-            };
+            return response.HasError is false ? Ok(response) : BadRequest(response);
         }
         catch (Exception e)
         {
-            var response = new LoginResponse { Status = 400, Error = e.Message };
+            var response = new LoginResponse { HasError = true, Error = e.Message };
             return BadRequest(response);
         }
     }

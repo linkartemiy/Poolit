@@ -30,8 +30,7 @@ public class UserService : IUserService
 
         return new RegisterResponse
         {
-            User = user,
-            Status = 200,
+            User = user
         };
     }
 
@@ -53,7 +52,7 @@ public class UserService : IUserService
             return new LoginResponse
             {
                 Error = "Wrong login or password",
-                Status = 400,
+                HasError = true,
             };
         }
 
@@ -62,7 +61,6 @@ public class UserService : IUserService
         return new LoginResponse
         {
             User = user,
-            Status = 200,
         };
     }
 
