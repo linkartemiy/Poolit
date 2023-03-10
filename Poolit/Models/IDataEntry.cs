@@ -2,5 +2,6 @@
 {
     public interface IDataEntry
     {
+        public ulong Id { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Poolit.Models;
-using Poolit.Models.Requests;
-using Poolit.Models.Responses;
 using Poolit.Services;
 using Poolit.Services.Interfaces;
 

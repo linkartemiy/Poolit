@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Poolit.Models;
-using Poolit.Models.Requests;
-using Poolit.Models.Responses;
 
 namespace Poolit.Services.Interfaces;
 

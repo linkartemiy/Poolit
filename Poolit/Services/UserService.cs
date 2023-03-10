@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Poolit.Models;
-using Poolit.Models.Requests;
-using Poolit.Models.Responses;
 using Poolit.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

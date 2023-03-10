@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Poolit.Models.Requests;
 using Poolit.Services.Interfaces;
-using Poolit.Models.Responses;
 using Poolit.Models;
+using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mime;
 
 namespace Poolit.Controllers;
 
@@ -48,6 +49,74 @@ public class FileController : Controller
             var response = new Response
             {
                 Data = new DataEntry<string>[] { dataEntry }
+            };
+            return response;
+        }
+        catch (Exception e)
+        {
+            var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
+            return BadRequest(response);
+        }
+    }
+
+    /// <summary>
+    /// File downloading
+    /// </summary>
+    /// <param name="id">File's id</param>
+    /// <returns>Url to file</returns>
+    [Route("/download")]
+    [HttpPost]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Response>> Download(ulong id)
+    {
+        try
+        {
+            var url = _fileService.GetFileUrlById(id);
+
+            var dataEntry = new DataEntry<string>()
+            {
+                Data = url,
+                Type = "string"
+            };
+
+            var response = new Response
+            {
+                Data = new DataEntry<string>[] { dataEntry }
+            };
+            return response;
+        }
+        catch (Exception e)
+        {
+            var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
+            return BadRequest(response);
+        }
+    }
+
+    /// <summary>
+    /// Getting user's files
+    /// </summary>
+    /// <param name="userId">user's id</param>
+    /// <returns>List of user's files</returns>
+    [Route("/getuserfiles")]
+    [HttpPost]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Response>> GetUserFiles(ulong userId)
+    {
+        try
+        {
+            var userFiles = _fileService.GetUserFiles(userId);
+
+            var dataEntry = new DataEntry<UserFile[]>()
+            {
+                Data = userFiles,
+                Type = "filearray"
+            };
+
+            var response = new Response
+            {
+                Data = new DataEntry<UserFile[]>[] { dataEntry }
             };
             return response;
         }
