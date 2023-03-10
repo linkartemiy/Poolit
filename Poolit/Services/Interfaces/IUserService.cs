@@ -7,5 +7,6 @@ public interface IUserService
 {
     public string HashPassword(User user, string password);
     public bool VerifyPassword(User user, string hashedPassword, string password);
+    public User GetUserByLogin(string login);
     public string CreateToken(User user);
 }

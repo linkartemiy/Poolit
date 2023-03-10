@@ -46,4 +46,9 @@ public class UserService : IUserService
         var handler = new JwtSecurityTokenHandler().WriteToken(token);
         return handler;
     }
+
+    public User GetUserByLogin(string login)
+    {
+        return new User { Login = login };
+    }
 }

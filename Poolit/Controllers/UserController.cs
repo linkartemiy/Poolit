@@ -107,4 +107,39 @@ public class UserController : ControllerBase
             return BadRequest(response);
         }
     }
+
+    /// <summary>
+    /// Getting user by login
+    /// </summary>
+    /// <param name="login">User's login</param>
+    /// <returns>User</returns>
+    [Route("/get/userbylogin")]
+    [HttpPost]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Response>> GetUserByLogin(string login)
+    {
+        try
+        {
+            var id = 0;
+            var user = _userService.GetUserByLogin(login);
+            user.Id = id;
+
+            var dataEntry = new DataEntry<User>()
+            {
+                Data = user,
+                Type = "user"
+            };
+
+            return new Response
+            {
+                Data = new DataEntry<User>[] { dataEntry },
+            };
+        }
+        catch (Exception e)
+        {
+            var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
+            return BadRequest(response);
+        }
+    }
 }
