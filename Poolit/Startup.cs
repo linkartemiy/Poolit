@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Http.Features;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
+using Poolit.Configurations;
 using Poolit.Services;
-using Poolit.Services.Interfaces;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 namespace Poolit;
 
@@ -27,6 +31,15 @@ public class Startup
 
         services.AddSwaggerGen(options =>
         {
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+
+            options.OperationFilter<SecurityRequirementsOperationFilter>();
+
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "API",
@@ -38,7 +51,7 @@ public class Startup
         });
 
         services.AddControllers().AddNewtonsoftJson(options =>
-       options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+        options.SerializerSettings.Converters.Add(new StringEnumConverter()));
         services.AddControllers().AddNewtonsoftJson();
 
         services.Configure<IISServerOptions>(options =>
@@ -52,20 +65,39 @@ public class Startup
             x.MultipartBodyLengthLimit = int.MaxValue;
             x.MultipartHeadersLengthLimit = int.MaxValue;
         });
+
         services.AddMvc();
 
-        services.Configure<TokensConfiguration>(Configuration.GetSection("Tokens"));
+        services.Configure<JwtConfiguration>(Configuration.GetSection(nameof(JwtConfiguration)));
 
-        //services.AddSwaggerGenNewtonsoftSupport();
-        //   services.Configure<Configuration>(Configuration.GetSection("ConnectionStrings"));
-        /*if (InDocker)
-        {
-            Database.ConnectionString = Configuration.GetConnectionString("DatabaseInDocker");
-        }
-        else
-        {
-            Database.ConnectionString = Configuration.GetConnectionString("Database");
-        }*/
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        Configuration.GetSection(nameof(JwtConfiguration)).GetValue<string>("Token"))),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context => {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("IS-TOKEN-EXPIRED", "true");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        services.AddSwaggerGenNewtonsoftSupport();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -84,6 +116,8 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Poolit.Services.Interfaces;
 using Poolit.Models;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
+using Poolit.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Poolit.Controllers;
 
@@ -27,10 +28,10 @@ public class FileController : Controller
     /// <param name="id">User's id.</param>
     /// <returns>Url to file</returns>
     [Route("/upload")]
-    [HttpPost]
+    [HttpPost, Authorize]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response>> Upload(IFormFile file, ulong id)
+    public async Task<ActionResult<Response>> Upload(IFormFile file, int id)
     {
         try
         {
@@ -52,7 +53,7 @@ public class FileController : Controller
             };
             return response;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
             return BadRequest(response);
@@ -65,10 +66,10 @@ public class FileController : Controller
     /// <param name="id">File's id</param>
     /// <returns>Url to file</returns>
     [Route("/download")]
-    [HttpPost]
+    [HttpPost, Authorize]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response>> Download(ulong id)
+    public async Task<ActionResult<Response>> Download(int id)
     {
         try
         {
@@ -86,7 +87,7 @@ public class FileController : Controller
             };
             return response;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
             return BadRequest(response);
@@ -99,10 +100,10 @@ public class FileController : Controller
     /// <param name="userId">user's id</param>
     /// <returns>List of user's files</returns>
     [Route("/getuserfiles")]
-    [HttpPost]
+    [HttpPost, Authorize]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response>> GetUserFiles(ulong userId)
+    public async Task<ActionResult<Response>> GetUserFiles(int userId)
     {
         try
         {
@@ -120,7 +121,7 @@ public class FileController : Controller
             };
             return response;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             var response = new Response { Error = "Something went wrong. Please try again later. We are sorry." };
             return BadRequest(response);
